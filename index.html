@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Liquid Prettier Playground</title>
+  <meta name="description" content="Format Shopify Liquid + HTML in your browser with Prettier and @shopify/prettier-plugin-liquid." />
+  <style>
+    :root {
+      --bg: #f6f6f4;
+      --panel: #ffffff;
+      --border: #dcdcd6;
+      --text: #1d1d1b;
+      --muted: #6b6b66;
+      --accent: #008060;
+      --accent-text: #ffffff;
+      --code-bg: #fbfbfa;
+      --error-bg: #fdecec;
+      --error-text: #a3221b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141413;
+        --panel: #1c1c1a;
+        --border: #33332f;
+        --text: #ececea;
+        --muted: #9a9a94;
+        --accent: #3fbf8f;
+        --accent-text: #0d1f18;
+        --code-bg: #181816;
+        --error-bg: #3a1a18;
+        --error-text: #ffb4ad;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.45 var(--sans);
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      flex-wrap: wrap;
+    }
+    header h1 { font-size: 16px; margin: 0; font-weight: 650; }
+    .version {
+      font: 12px var(--mono);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px 8px;
+    }
+    header .spacer { flex: 1; }
+    header a { color: var(--muted); text-decoration: none; font-size: 13px; }
+    header a:hover { color: var(--text); }
+
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 20px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      font-size: 13px;
+    }
+    .options label { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; cursor: pointer; }
+    .options code { font: 12px var(--mono); color: var(--muted); }
+    .options input[type="number"] {
+      width: 64px; padding: 4px 6px;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: var(--code-bg); color: var(--text); font: 13px var(--mono);
+    }
+    .options select {
+      padding: 4px 6px;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: var(--code-bg); color: var(--text); font: 13px var(--sans);
+    }
+    .options input[type="checkbox"] { accent-color: var(--accent); }
+
+    /* Tab width toggle */
+    .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .seg button {
+      border: 0; background: var(--code-bg); color: var(--text);
+      padding: 4px 12px; font: 13px var(--mono); cursor: pointer;
+    }
+    .seg button + button { border-left: 1px solid var(--border); }
+    .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+    .seg button:disabled { opacity: .45; cursor: not-allowed; }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 0;
+    }
+    .pane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+    .pane + .pane { border-left: 1px solid var(--border); }
+    .pane-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 12px; font-size: 12px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+    }
+    .pane-head button {
+      border: 1px solid var(--border); background: var(--panel); color: var(--text);
+      border-radius: 6px; padding: 3px 10px; font: 12px var(--sans); cursor: pointer;
+      text-transform: none; letter-spacing: 0;
+    }
+    .pane-head button:hover { border-color: var(--accent); }
+    textarea, pre {
+      flex: 1; margin: 0; padding: 12px;
+      font: 13px/1.55 var(--mono);
+      background: var(--code-bg); color: var(--text);
+      border: 0; outline: none; resize: none;
+      overflow: auto; white-space: pre; tab-size: 4;
+      min-height: 0;
+    }
+    pre.error { background: var(--error-bg); color: var(--error-text); white-space: pre-wrap; }
+
+    footer {
+      padding: 8px 16px; font-size: 12px; color: var(--muted);
+      border-top: 1px solid var(--border); background: var(--panel);
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    footer a { color: inherit; }
+
+    @media (max-width: 760px) {
+      main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      .pane + .pane { border-left: 0; border-top: 1px solid var(--border); }
+      textarea, pre { min-height: 240px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Prettier Plugin Liquid</h1>
+    <span class="version" id="version">loading…</span>
+    <span class="spacer"></span>
+    <a href="https://shopify.dev/docs/storefronts/themes/tools/liquid-prettier-plugin" target="_blank" rel="noopener">Docs</a>
+    <a href="https://github.com/Shopify/theme-tools/tree/main/packages/prettier-plugin-liquid" target="_blank" rel="noopener">GitHub</a>
+  </header>
+
+  <form class="options" id="options" onsubmit="return false">
+    <label>
+      <code>--print-width</code>
+      <input type="number" name="printWidth" min="20" max="320" value="120" />
+    </label>
+
+    <label>
+      <code>--tab-width</code>
+      <span class="seg" id="tabWidth" role="group" aria-label="Tab width">
+        <button type="button" data-value="2" aria-pressed="true">2</button>
+        <button type="button" data-value="4" aria-pressed="false">4</button>
+      </span>
+    </label>
+
+    <label><input type="checkbox" name="useTabs" /> <code>--use-tabs</code></label>
+
+    <label>
+      <code>--html-whitespace-sensitivity</code>
+      <select name="htmlWhitespaceSensitivity">
+        <option value="css" selected>css</option>
+        <option value="strict">strict</option>
+        <option value="ignore">ignore</option>
+      </select>
+    </label>
+
+    <label><input type="checkbox" name="singleQuote" /> <code>--single-quote</code></label>
+    <label><input type="checkbox" name="liquidSingleQuote" checked /> <code>--liquid-single-quote</code></label>
+    <label><input type="checkbox" name="embeddedSingleQuote" checked /> <code>--embedded-single-quote</code></label>
+    <label><input type="checkbox" name="singleLineLinkTags" /> <code>--single-line-link-tags</code></label>
+    <label><input type="checkbox" name="indentSchema" /> <code>--indent-schema</code></label>
+  </form>
+
+  <main>
+    <section class="pane">
+      <div class="pane-head">
+        <span>Input</span>
+        <button type="button" id="reset">Reset example</button>
+      </div>
+      <textarea id="input" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Liquid input"></textarea>
+    </section>
+    <section class="pane">
+      <div class="pane-head">
+        <span>Output</span>
+        <span>
+          <button type="button" id="share">Copy link</button>
+          <button type="button" id="copy">Copy code</button>
+        </span>
+      </div>
+      <pre id="output" aria-live="polite"></pre>
+    </section>
+  </main>
+
+  <footer>
+    <span>Runs entirely in your browser — nothing is uploaded.</span>
+    <span>Inspired by the <a href="https://prettier.io/playground" target="_blank" rel="noopener">Prettier playground</a>.</span>
+  </footer>
+
+  <!-- Prettier 3 + Shopify Liquid plugin (pinned versions; bump these to upgrade) -->
+  <script src="https://cdn.jsdelivr.net/npm/prettier@3.9.10/standalone.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@shopify/prettier-plugin-liquid@1.11.2/standalone.js"></script>
+
+  <script>
+    const PLUGIN_VERSION = '1.11.2';
+
+    const EXAMPLE = `<ul class="container">
+{% for el in col %}<li class="{% cycle 'odd', 'even' %}" id="something" data-prop="some value">
+ <div class="item-container"> <label>{{ el.value }}</label>
+ {% assign alt = el.featured_image.alt | replace: 'vanilla', 'chocolate' | upcase %}
+ {{ el.featured_image | image_url | image_tag }}
+ </div>
+ </li> {% endfor %}
+</ul>
+`;
+
+    const DEFAULTS = {
+      printWidth: 120,
+      tabWidth: 2,
+      useTabs: false,
+      htmlWhitespaceSensitivity: 'css',
+      singleQuote: false,
+      liquidSingleQuote: true,
+      embeddedSingleQuote: true,
+      singleLineLinkTags: false,
+      indentSchema: false,
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const form = $('options');
+    const input = $('input');
+    const output = $('output');
+    const tabSeg = $('tabWidth');
+
+    let options = { ...DEFAULTS };
+
+    // ---------- State <-> URL (so results can be shared) ----------
+    function encodeState() {
+      const diff = {};
+      for (const k in options) if (options[k] !== DEFAULTS[k]) diff[k] = options[k];
+      const data = JSON.stringify({ code: input.value, options: diff });
+      return btoa(unescape(encodeURIComponent(data)));
+    }
+    function decodeState() {
+      try {
+        const hash = location.hash.slice(1);
+        if (!hash) return null;
+        return JSON.parse(decodeURIComponent(escape(atob(hash))));
+      } catch { return null; }
+    }
+
+    // ---------- Sync options -> UI ----------
+    function renderOptions() {
+      for (const el of form.elements) {
+        if (!el.name) continue;
+        if (el.type === 'checkbox') el.checked = !!options[el.name];
+        else el.value = options[el.name];
+      }
+      for (const b of tabSeg.querySelectorAll('button')) {
+        b.setAttribute('aria-pressed', String(Number(b.dataset.value) === options.tabWidth));
+      }
+      output.style.tabSize = options.tabWidth;
+      input.style.tabSize = options.tabWidth;
+    }
+
+    // ---------- Formatting ----------
+    let runId = 0;
+    async function format() {
+      const id = ++runId;
+      try {
+        const result = await prettier.format(input.value, {
+          parser: 'liquid-html',
+          plugins: [prettierPluginLiquid],
+          ...options,
+        });
+        if (id !== runId) return;
+        output.classList.remove('error');
+        output.textContent = result;
+      } catch (err) {
+        if (id !== runId) return;
+        output.classList.add('error');
+        output.textContent = String(err && err.message ? err.message : err);
+      }
+      history.replaceState(null, '', '#' + encodeState());
+    }
+
+    let timer;
+    const scheduleFormat = () => { clearTimeout(timer); timer = setTimeout(format, 150); };
+
+    // ---------- Events ----------
+    form.addEventListener('input', (e) => {
+      const el = e.target;
+      if (!el.name) return;
+      if (el.type === 'checkbox') options[el.name] = el.checked;
+      else if (el.type === 'number') {
+        const n = parseInt(el.value, 10);
+        if (Number.isNaN(n)) return;
+        options[el.name] = n;
+      } else options[el.name] = el.value;
+      renderOptions();
+      format();
+    });
+
+    tabSeg.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      options.tabWidth = Number(b.dataset.value);
+      renderOptions();
+      format();
+    });
+
+    input.addEventListener('input', scheduleFormat);
+
+    // Let Tab insert spaces in the input instead of leaving the field
+    input.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
+      e.preventDefault();
+      const indent = options.useTabs ? '\t' : ' '.repeat(options.tabWidth);
+      const { selectionStart: s, selectionEnd: end } = input;
+      input.setRangeText(indent, s, end, 'end');
+      scheduleFormat();
+    });
+
+    $('reset').addEventListener('click', () => {
+      input.value = EXAMPLE;
+      options = { ...DEFAULTS };
+      renderOptions();
+      format();
+    });
+
+    function flash(btn, text) {
+      const old = btn.textContent;
+      btn.textContent = text;
+      setTimeout(() => (btn.textContent = old), 1200);
+    }
+    async function copyText(text, btn) {
+      try { await navigator.clipboard.writeText(text); flash(btn, 'Copied!'); }
+      catch {
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); flash(btn, 'Copied!'); } catch { flash(btn, 'Copy failed'); }
+        ta.remove();
+      }
+    }
+    $('copy').addEventListener('click', (e) => copyText(output.textContent, e.currentTarget));
+    $('share').addEventListener('click', (e) => copyText(location.href, e.currentTarget));
+
+    // ---------- Init ----------
+    $('version').textContent = 'v' + PLUGIN_VERSION;
+    if (typeof prettier === 'undefined' || typeof prettierPluginLiquid === 'undefined') {
+      output.classList.add('error');
+      output.textContent = 'Could not load Prettier or the Liquid plugin from the CDN. Check your connection and reload.';
+      for (const el of form.elements) el.disabled = true;
+      for (const b of tabSeg.querySelectorAll('button')) b.disabled = true;
+    } else {
+      const saved = decodeState();
+      input.value = saved && typeof saved.code === 'string' ? saved.code : EXAMPLE;
+      if (saved && saved.options) options = { ...DEFAULTS, ...saved.options };
+      renderOptions();
+      format();
+    }
+  </script>
+</body>
+</html>
