@@ -209,13 +209,14 @@
     <span>Inspired by the <a href="https://prettier.io/playground" target="_blank" rel="noopener">Prettier playground</a>.</span>
   </footer>
 
-  <!-- Prettier 3 + Shopify Liquid plugin (pinned versions; bump these to upgrade) -->
-  <script src="https://cdn.jsdelivr.net/npm/prettier@3.9.10/standalone.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@shopify/prettier-plugin-liquid@1.11.2/standalone.js"></script>
+  <!--
+    Per Shopify docs, "Use the plugin in the browser":
+    https://shopify.dev/docs/storefronts/themes/tools/liquid-prettier-plugin#use-the-plugin-in-the-browser
+  -->
+  <script src="https://unpkg.com/prettier/standalone.js"></script>
+  <script src="https://unpkg.com/@shopify/prettier-plugin-liquid/standalone.js"></script>
 
   <script>
-    const PLUGIN_VERSION = '1.11.2';
-
     const EXAMPLE = `<ul class="container">
 {% for el in col %}<li class="{% cycle 'odd', 'even' %}" id="something" data-prop="some value">
  <div class="item-container"> <label>{{ el.value }}</label>
@@ -358,7 +359,12 @@
     $('share').addEventListener('click', (e) => copyText(location.href, e.currentTarget));
 
     // ---------- Init ----------
-    $('version').textContent = 'v' + PLUGIN_VERSION;
+    // The doc's unpkg links load the latest release, so read the version it resolved to.
+    fetch('https://unpkg.com/@shopify/prettier-plugin-liquid/package.json')
+      .then((r) => r.json())
+      .then((pkg) => { $('version').textContent = 'v' + pkg.version; })
+      .catch(() => { $('version').textContent = 'latest'; });
+
     if (typeof prettier === 'undefined' || typeof prettierPluginLiquid === 'undefined') {
       output.classList.add('error');
       output.textContent = 'Could not load Prettier or the Liquid plugin from the CDN. Check your connection and reload.';
