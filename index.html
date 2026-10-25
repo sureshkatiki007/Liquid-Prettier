@@ -1,213 +1,370 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Liquid Prettier Playground</title>
-  <meta name="description" content="Format Shopify Liquid + HTML in your browser with Prettier and @shopify/prettier-plugin-liquid." />
-  <style>
-    :root {
-      --bg: #f6f6f4;
-      --panel: #ffffff;
-      --border: #dcdcd6;
-      --text: #1d1d1b;
-      --muted: #6b6b66;
-      --accent: #008060;
-      --accent-text: #ffffff;
-      --code-bg: #fbfbfa;
-      --error-bg: #fdecec;
-      --error-text: #a3221b;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #141413;
-        --panel: #1c1c1a;
-        --border: #33332f;
-        --text: #ececea;
-        --muted: #9a9a94;
-        --accent: #3fbf8f;
-        --accent-text: #0d1f18;
-        --code-bg: #181816;
-        --error-bg: #3a1a18;
-        --error-text: #ffb4ad;
-      }
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font: 14px/1.45 var(--sans);
-      display: flex;
-      flex-direction: column;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquid Prettier</title>
+<meta name="description" content="Format Shopify Liquid + HTML in your browser with Prettier and @shopify/prettier-plugin-liquid.">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="70">{%25</text></svg>' />
+<style>
+  :root{
+    --mono: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --arial: arial, tahoma, helvetica, sans-serif;
 
-    header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      background: var(--panel);
-      flex-wrap: wrap;
-    }
-    header h1 { font-size: 16px; margin: 0; font-weight: 650; }
-    .version {
-      font: 12px var(--mono);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 2px 8px;
-    }
-    header .spacer { flex: 1; }
-    header a { color: var(--muted); text-decoration: none; font-size: 13px; }
-    header a:hover { color: var(--text); }
+    --body-bg: #ffffff;
+    --panel-bg: #f6f7f9;
+    --border: #e2e4e8;
+    --text: #24292e;
+    --textarea-bg: #f3f5f6;
+    --textarea-value: #7e7e7e;
+    --output-value: #24292e;
+    --muted: #8a8f98;
+    --accent: #5c5c5c;
+    --error: #ea4335;
+    --error-bg: #fdf1f0;
 
-    .options {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px 20px;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      background: var(--panel);
-      font-size: 13px;
-    }
-    .options label { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; cursor: pointer; }
-    .options code { font: 12px var(--mono); color: var(--muted); }
-    .options input[type="number"] {
-      width: 64px; padding: 4px 6px;
-      border: 1px solid var(--border); border-radius: 6px;
-      background: var(--code-bg); color: var(--text); font: 13px var(--mono);
-    }
-    .options select {
-      padding: 4px 6px;
-      border: 1px solid var(--border); border-radius: 6px;
-      background: var(--code-bg); color: var(--text); font: 13px var(--sans);
-    }
-    .options input[type="checkbox"] { accent-color: var(--accent); }
+    --btn-bg: #fff;
+    --scrollbar-thumb: #767676;
+    --content-font: 12px;
+  }
+  html[data-theme="dark"]{
+    --body-bg: #20201f;
+    --panel-bg: #20201f;
+    --border: #365c8e;
+    --text: #d7dde5;
+    --textarea-bg: var(--body-bg);
+    --textarea-value: #7e7e7e;
+    --output-value: #d7dde5;
+    --muted: #6b7685;
+    --accent: #2c9dee;
+    --error: #f7768e;
+    --error-bg: #1a1116;
 
-    /* Tab width toggle */
-    .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
-    .seg button {
-      border: 0; background: var(--code-bg); color: var(--text);
-      padding: 4px 12px; font: 13px var(--mono); cursor: pointer;
-    }
-    .seg button + button { border-left: 1px solid var(--border); }
-    .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); font-weight: 600; }
-    .seg button:disabled { opacity: .45; cursor: not-allowed; }
+    --btn-bg: #1a212b;
+    --scrollbar-thumb: #767676;
+  }
+  *, *:before, *:after { box-sizing: border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background: var(--body-bg);
+    color: var(--text);
+    font-family: var(--arial);
+    font-size: 11px;
+    white-space: nowrap;
+    display:flex;
+    flex-direction:column;
+  }
 
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 0;
-    }
-    .pane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
-    .pane + .pane { border-left: 1px solid var(--border); }
-    .pane-head {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 6px 12px; font-size: 12px; color: var(--muted);
-      text-transform: uppercase; letter-spacing: .05em;
-      border-bottom: 1px solid var(--border);
-    }
-    .pane-head button {
-      border: 1px solid var(--border); background: var(--panel); color: var(--text);
-      border-radius: 6px; padding: 3px 10px; font: 12px var(--sans); cursor: pointer;
-      text-transform: none; letter-spacing: 0;
-    }
-    .pane-head button:hover { border-color: var(--accent); }
-    textarea, pre {
-      flex: 1; margin: 0; padding: 12px;
-      font: 13px/1.55 var(--mono);
-      background: var(--code-bg); color: var(--text);
-      border: 0; outline: none; resize: none;
-      overflow: auto; white-space: pre; tab-size: 4;
-      min-height: 0;
-    }
-    pre.error { background: var(--error-bg); color: var(--error-text); white-space: pre-wrap; }
+  /* ---------- header (same as JSON Viewer) ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap:15px;
+    background: var(--panel-bg);
+    padding:5px 15px 6px 15px;
+    border-bottom:1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  header h1{
+    font-family: var(--sans);
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:0.01em;
+    color:var(--accent);
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  #version{
+    font-family: var(--mono);
+    font-size:10px;
+    font-weight:400;
+    color: var(--muted);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:1px 7px;
+  }
+  .toolbar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+    flex-wrap:wrap;
+  }
+  button, .file-btn{
+    background: var(--btn-bg);
+    border:1px solid var(--border);
+    color: var(--text);
+    font-family: var(--arial);
+    font-size:12px;
+    padding:6px 12px;
+    border-radius:5px;
+    cursor:pointer;
+    transition: border-color .15s, color .15s;
+  }
+  button:hover, .file-btn:hover{
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  button.is-on{
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  button:disabled{ opacity:.45; cursor:not-allowed; }
+  .font-ctrl{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    border:1px solid var(--border);
+    border-radius:5px;
+    padding:2px 4px;
+    background: var(--btn-bg);
+  }
+  .font-ctrl button{
+    border:none;
+    padding:4px 4px;
+    background: transparent;
+  }
+  .font-ctrl button:hover{ color: var(--accent); }
+  .font-ctrl button:disabled{ opacity:0.35; cursor:not-allowed; color: var(--text); }
+  #fontSizeLabel{
+    font-size:11px;
+    color: var(--muted);
+    min-width:20px;
+    text-align:center;
+    font-family: var(--mono);
+  }
+  input[type=file]{ display:none; }
 
-    footer {
-      padding: 8px 16px; font-size: 12px; color: var(--muted);
-      border-top: 1px solid var(--border); background: var(--panel);
-      display: flex; gap: 16px; flex-wrap: wrap;
-    }
-    footer a { color: inherit; }
+  /* ---------- options popover ---------- */
+  .options-wrap{ position:relative; }
+  #optionsPanel{
+    position:absolute;
+    right:0;
+    top:calc(100% + 6px);
+    z-index:10;
+    min-width:290px;
+    background: var(--panel-bg);
+    border:1px solid var(--border);
+    border-radius:5px;
+    padding:10px 12px;
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+    display:none;
+    font-size:14px;
+  }
+  #optionsPanel.open{ display:block; }
+  #optionsPanel .opt{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:5px 0;
+    cursor:pointer;
+  }
+  #optionsPanel .opt + .opt{ border-top:1px dotted var(--border); }
+  #optionsPanel code{
+	font-family: var(--mono);
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:14px;
+	color: var(--text); 
+  }
+  #optionsPanel input[type=number], #optionsPanel select{
+    background: var(--btn-bg);
+    color: var(--text);
+    border:1px solid var(--border);
+    border-radius:5px;
+    font-family: var(--mono);
+    font-size:14px;
+    padding:3px 6px;
+  }
+  #optionsPanel input[type=number]{ width:72px; }
+  #optionsPanel input[type=checkbox]{
+    accent-color: var(--accent);
+    width:15px;
+    height:15px;
+    margin:0;
+    flex-shrink:0;
+    cursor:pointer;
+  }
+  #optionsPanel .links{
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px solid var(--border);
+    display:flex;
+    gap:12px;
+  }
+  #optionsPanel .links a{ color: var(--muted); text-decoration:none; }
+  #optionsPanel .links a:hover{ color: var(--accent); }
 
-    @media (max-width: 760px) {
-      main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
-      .pane + .pane { border-left: 0; border-top: 1px solid var(--border); }
-      textarea, pre { min-height: 240px; }
-    }
-  </style>
+  /* ---------- error bar (same as JSON Viewer) ---------- */
+  #error{
+    color: var(--error);
+    padding:10px 16px;
+    font-family: var(--mono);
+    font-size:var(--content-font);
+    line-height:1.5;
+    border-bottom:1px solid var(--border);
+    display:none;
+    background: var(--error-bg);
+    white-space: pre-wrap;
+    max-height:30vh;
+    overflow:auto;
+  }
+
+  /* ---------- panels + dragger (same as JSON Viewer) ---------- */
+  main{
+    flex:1;
+    display:flex;
+    min-height:0;
+  }
+  .panel{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    background: var(--textarea-bg);
+  }
+  .dragger{
+    width:6px;
+    flex-shrink:0;
+    background: var(--border);
+    cursor: col-resize;
+    position: relative;
+    transition: background .15s;
+  }
+  .dragger:hover, .dragger.dragging{ background: var(--accent); }
+  .dragger::after{
+    content:'';
+    position:absolute;
+    top:0; bottom:0;
+    left:-3px; right:-3px;
+  }
+  body.resizing{ cursor: col-resize; user-select: none; }
+  body.resizing .panel{ pointer-events: none; }
+
+  .editor-wrap{
+    flex:1;
+    min-height:0;
+    display:flex;
+    background: var(--textarea-bg);
+    overflow:hidden;
+  }
+  .line-numbers{
+    flex-shrink:0;
+    padding:10px 8px 10px 12px;
+    font-family: var(--mono);
+    font-size: var(--content-font);
+    line-height:1.5;
+    color: var(--muted);
+    text-align:right;
+    white-space:pre;
+    overflow:hidden;
+    user-select:none;
+    border-right:1px solid var(--border);
+  }
+  textarea, #output{
+    flex:1;
+    min-width:0;
+    margin:0;
+    background: var(--textarea-bg);
+    border:none;
+    outline:none;
+    resize:none;
+    font-family: var(--mono);
+    font-size: var(--content-font);
+    line-height:1.5;
+    padding:10px;
+    white-space: pre;
+    overflow:auto;
+    tab-size:2;
+  }
+  textarea{ color: var(--textarea-value); }
+  #output{ color: var(--output-value); }
+
+  #output::-webkit-scrollbar, textarea::-webkit-scrollbar{ width:0px; height:0px; }
+  #output:hover::-webkit-scrollbar, textarea:hover::-webkit-scrollbar{ width:6px; height:6px; }
+  #output::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb{ cursor:pointer; background: var(--scrollbar-thumb); border-radius:0px; }
+
+  @media (max-width: 760px){
+    header{ justify-content:center; position:relative; }
+    .options-wrap{ position:static; }
+    #optionsPanel{ left:16px; right:16px; top:calc(100% + 4px); min-width:0; }
+    #optionsPanel .opt code{ white-space:normal; overflow-wrap:anywhere; }
+    main{ flex-direction:column; }
+    .dragger{ display:none; }
+    .panel{ min-height:240px; }
+    .panel + .dragger + .panel{ border-top:6px solid var(--border); }
+  }
+</style>
 </head>
 <body>
   <header>
-    <h1>Prettier Plugin Liquid</h1>
-    <span class="version" id="version">loading…</span>
-    <span class="spacer"></span>
-    <a href="https://shopify.dev/docs/storefronts/themes/tools/liquid-prettier-plugin" target="_blank" rel="noopener">Docs</a>
-    <a href="https://github.com/Shopify/theme-tools/tree/main/packages/prettier-plugin-liquid" target="_blank" rel="noopener">GitHub</a>
+    <div class="toolbar">
+      <label class="file-btn">Open File<input type="file" id="fileInput" accept=".liquid,.html,.htm,.txt,text/plain,text/html"></label>
+      <button id="format4Btn" type="button">Format 4</button>
+      <button id="format2Btn" type="button">Format 2</button>
+      <button id="copyBtn" type="button">Copy</button>
+      <button id="shareBtn" type="button">Copy link</button>
+      <button id="clearBtn" type="button">Clear</button>
+    </div>
+
+    <h1>Liquid Prettier <span id="version">…</span></h1>
+
+    <div class="toolbar">
+      <button id="resetBtn" type="button">Example</button>
+      <div class="options-wrap">
+        <button id="optionsBtn" type="button" aria-expanded="false" aria-controls="optionsPanel">Options ▾</button>
+        <form id="optionsPanel" onsubmit="return false">
+          <label class="opt"><code>--print-width</code><input type="number" name="printWidth" min="120" max="320" value="250" step="10"></label>
+          <label class="opt"><code>--use-tabs</code><input type="checkbox" name="useTabs"></label>
+          <label class="opt"><code>--html-whitespace-sensitivity</code>
+            <select name="htmlWhitespaceSensitivity">
+              <option value="css" selected>css</option>
+              <option value="strict">strict</option>
+              <option value="ignore">ignore</option>
+            </select>
+          </label>
+          <label class="opt"><code>--single-quote</code><input type="checkbox" name="singleQuote"></label>
+          <label class="opt"><code>--liquid-single-quote</code><input type="checkbox" name="liquidSingleQuote" checked></label>
+          <label class="opt"><code>--embedded-single-quote</code><input type="checkbox" name="embeddedSingleQuote" checked></label>
+          <label class="opt"><code>--single-line-link-tags</code><input type="checkbox" name="singleLineLinkTags"></label>
+          <label class="opt"><code>--indent-schema</code><input type="checkbox" name="indentSchema"></label>
+          <div class="links">
+            <a href="https://shopify.dev/docs/storefronts/themes/tools/liquid-prettier-plugin" target="_blank" rel="noopener">Docs</a>
+            <a href="https://github.com/Shopify/theme-tools/tree/main/packages/prettier-plugin-liquid" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </form>
+      </div>
+      <span class="font-ctrl">
+        <button id="fontDec" type="button" title="Decrease font size">A⁻</button>
+        <span id="fontSizeLabel">12</span>
+        <button id="fontInc" type="button" title="Increase font size">A⁺</button>
+      </span>
+      <button id="themeToggle" type="button">🌙 Dark</button>
+    </div>
   </header>
 
-  <form class="options" id="options" onsubmit="return false">
-    <label>
-      <code>--print-width</code>
-      <input type="number" name="printWidth" min="20" max="320" value="120" />
-    </label>
-
-    <label>
-      <code>--tab-width</code>
-      <span class="seg" id="tabWidth" role="group" aria-label="Tab width">
-        <button type="button" data-value="2" aria-pressed="true">2</button>
-        <button type="button" data-value="4" aria-pressed="false">4</button>
-      </span>
-    </label>
-
-    <label><input type="checkbox" name="useTabs" /> <code>--use-tabs</code></label>
-
-    <label>
-      <code>--html-whitespace-sensitivity</code>
-      <select name="htmlWhitespaceSensitivity">
-        <option value="css" selected>css</option>
-        <option value="strict">strict</option>
-        <option value="ignore">ignore</option>
-      </select>
-    </label>
-
-    <label><input type="checkbox" name="singleQuote" /> <code>--single-quote</code></label>
-    <label><input type="checkbox" name="liquidSingleQuote" checked /> <code>--liquid-single-quote</code></label>
-    <label><input type="checkbox" name="embeddedSingleQuote" checked /> <code>--embedded-single-quote</code></label>
-    <label><input type="checkbox" name="singleLineLinkTags" /> <code>--single-line-link-tags</code></label>
-    <label><input type="checkbox" name="indentSchema" /> <code>--indent-schema</code></label>
-  </form>
+  <div id="error"></div>
 
   <main>
-    <section class="pane">
-      <div class="pane-head">
-        <span>Input</span>
-        <button type="button" id="reset">Reset example</button>
+    <div class="panel" id="leftPanel">
+      <div class="editor-wrap">
+        <div class="line-numbers" id="inputLines" aria-hidden="true">1</div>
+        <textarea id="input" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Liquid input" placeholder="Paste Liquid / HTML here…"></textarea>
       </div>
-      <textarea id="input" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Liquid input"></textarea>
-    </section>
-    <section class="pane">
-      <div class="pane-head">
-        <span>Output</span>
-        <span>
-          <button type="button" id="share">Copy link</button>
-          <button type="button" id="copy">Copy code</button>
-        </span>
+    </div>
+    <div class="dragger" id="dragger"></div>
+    <div class="panel" id="rightPanel">
+      <div class="editor-wrap">
+        <div class="line-numbers" id="outputLines" aria-hidden="true">1</div>
+        <pre id="output" aria-live="polite" aria-label="Formatted output"></pre>
       </div>
-      <pre id="output" aria-live="polite"></pre>
-    </section>
+    </div>
   </main>
-
-  <footer>
-    <span>Runs entirely in your browser — nothing is uploaded.</span>
-    <span>Inspired by the <a href="https://prettier.io/playground" target="_blank" rel="noopener">Prettier playground</a>.</span>
-  </footer>
 
   <!--
     Per Shopify docs, "Use the plugin in the browser":
@@ -216,8 +373,8 @@
   <script src="https://unpkg.com/prettier/standalone.js"></script>
   <script src="https://unpkg.com/@shopify/prettier-plugin-liquid/standalone.js"></script>
 
-  <script>
-    const EXAMPLE = `<ul class="container">
+<script>
+const EXAMPLE = `<ul class="container">
 {% for el in col %}<li class="{% cycle 'odd', 'even' %}" id="something" data-prop="some value">
  <div class="item-container"> <label>{{ el.value }}</label>
  {% assign alt = el.featured_image.alt | replace: 'vanilla', 'chocolate' | upcase %}
@@ -227,156 +384,280 @@
 </ul>
 `;
 
-    const DEFAULTS = {
-      printWidth: 120,
-      tabWidth: 2,
-      useTabs: false,
-      htmlWhitespaceSensitivity: 'css',
-      singleQuote: false,
-      liquidSingleQuote: true,
-      embeddedSingleQuote: true,
-      singleLineLinkTags: false,
-      indentSchema: false,
-    };
+const DEFAULTS = {
+  printWidth: 250,
+  tabWidth: 2,
+  useTabs: false,
+  htmlWhitespaceSensitivity: 'css',
+  singleQuote: false,
+  liquidSingleQuote: true,
+  embeddedSingleQuote: true,
+  singleLineLinkTags: false,
+  indentSchema: false,
+};
 
-    const $ = (id) => document.getElementById(id);
-    const form = $('options');
-    const input = $('input');
-    const output = $('output');
-    const tabSeg = $('tabWidth');
+const $ = (id) => document.getElementById(id);
+const input = $('input');
+const output = $('output');
+const inputLines = $('inputLines');
+const outputLines = $('outputLines');
+const errorBox = $('error');
+const form = $('optionsPanel');
+const optionsBtn = $('optionsBtn');
+const format2Btn = $('format2Btn');
+const format4Btn = $('format4Btn');
+const themeToggle = $('themeToggle');
+const fontDec = $('fontDec');
+const fontInc = $('fontInc');
+const fontSizeLabel = $('fontSizeLabel');
 
-    let options = { ...DEFAULTS };
+let options = { ...DEFAULTS };
+let contentFontSize = 12;
 
-    // ---------- State <-> URL (so results can be shared) ----------
-    function encodeState() {
-      const diff = {};
-      for (const k in options) if (options[k] !== DEFAULTS[k]) diff[k] = options[k];
-      const data = JSON.stringify({ code: input.value, options: diff });
-      return btoa(unescape(encodeURIComponent(data)));
-    }
-    function decodeState() {
-      try {
-        const hash = location.hash.slice(1);
-        if (!hash) return null;
-        return JSON.parse(decodeURIComponent(escape(atob(hash))));
-      } catch { return null; }
-    }
+// ---------- per-viewer preferences (theme, font size) ----------
+function loadPref(key, fallback){
+  try { const v = localStorage.getItem('lp-' + key); return v === null ? fallback : v; } catch { return fallback; }
+}
+function savePref(key, value){
+  try { localStorage.setItem('lp-' + key, value); } catch {}
+}
 
-    // ---------- Sync options -> UI ----------
-    function renderOptions() {
-      for (const el of form.elements) {
-        if (!el.name) continue;
-        if (el.type === 'checkbox') el.checked = !!options[el.name];
-        else el.value = options[el.name];
-      }
-      for (const b of tabSeg.querySelectorAll('button')) {
-        b.setAttribute('aria-pressed', String(Number(b.dataset.value) === options.tabWidth));
-      }
-      output.style.tabSize = options.tabWidth;
-      input.style.tabSize = options.tabWidth;
-    }
+// ---------- theme ----------
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggle.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+}
+themeToggle.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  savePref('theme', next);
+});
 
-    // ---------- Formatting ----------
-    let runId = 0;
-    async function format() {
-      const id = ++runId;
-      try {
-        const result = await prettier.format(input.value, {
-          parser: 'liquid-html',
-          plugins: [prettierPluginLiquid],
-          ...options,
-        });
-        if (id !== runId) return;
-        output.classList.remove('error');
-        output.textContent = result;
-      } catch (err) {
-        if (id !== runId) return;
-        output.classList.add('error');
-        output.textContent = String(err && err.message ? err.message : err);
-      }
-      history.replaceState(null, '', '#' + encodeState());
-    }
+// ---------- font size ----------
+function applyFontSize(){
+  contentFontSize = Math.min(20, Math.max(10, contentFontSize));
+  document.documentElement.style.setProperty('--content-font', contentFontSize + 'px');
+  fontSizeLabel.textContent = contentFontSize + '';
+  fontDec.disabled = contentFontSize <= 10;
+  fontInc.disabled = contentFontSize >= 20;
+  savePref('font', contentFontSize);
+}
+fontDec.addEventListener('click', () => { contentFontSize -= 1; applyFontSize(); });
+fontInc.addEventListener('click', () => { contentFontSize += 1; applyFontSize(); });
 
-    let timer;
-    const scheduleFormat = () => { clearTimeout(timer); timer = setTimeout(format, 150); };
+// ---------- dragger ----------
+(function initDragger(){
+  const dragger = $('dragger');
+  const leftPanel = $('leftPanel');
+  const rightPanel = $('rightPanel');
+  let dragging = false;
+  dragger.addEventListener('mousedown', (e) => {
+    dragging = true;
+    dragger.classList.add('dragging');
+    document.body.classList.add('resizing');
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const rect = leftPanel.parentElement.getBoundingClientRect();
+    let percent = ((e.clientX - rect.left) / rect.width) * 100;
+    percent = Math.min(100, Math.max(0, percent));
+    leftPanel.style.flex = `0 0 ${percent}%`;
+    rightPanel.style.flex = '1 1 auto';
+  });
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    dragger.classList.remove('dragging');
+    document.body.classList.remove('resizing');
+  });
+})();
 
-    // ---------- Events ----------
-    form.addEventListener('input', (e) => {
-      const el = e.target;
-      if (!el.name) return;
-      if (el.type === 'checkbox') options[el.name] = el.checked;
-      else if (el.type === 'number') {
-        const n = parseInt(el.value, 10);
-        if (Number.isNaN(n)) return;
-        options[el.name] = n;
-      } else options[el.name] = el.value;
-      renderOptions();
-      format();
+// ---------- line numbers ----------
+function renderLineNumbers(el, text, scroller){
+  if (text === '') { el.textContent = ''; return; }
+  const count = text.replace(/\n$/, '').split('\n').length;
+  let out = '';
+  for (let i = 1; i <= count; i++) out += i + (i < count ? '\n' : '');
+  el.textContent = out;
+  el.scrollTop = scroller.scrollTop;
+}
+input.addEventListener('scroll', () => { inputLines.scrollTop = input.scrollTop; });
+output.addEventListener('scroll', () => { outputLines.scrollTop = output.scrollTop; });
+
+// ---------- error bar ----------
+function showError(msg){
+  errorBox.style.display = msg ? 'block' : 'none';
+  errorBox.textContent = msg || '';
+}
+
+// ---------- state <-> URL (shareable links) ----------
+function encodeState(){
+  const diff = {};
+  for (const k in options) if (options[k] !== DEFAULTS[k]) diff[k] = options[k];
+  return btoa(unescape(encodeURIComponent(JSON.stringify({ code: input.value, options: diff }))));
+}
+function decodeState(){
+  try {
+    const hash = location.hash.slice(1);
+    return hash ? JSON.parse(decodeURIComponent(escape(atob(hash)))) : null;
+  } catch { return null; }
+}
+
+// ---------- options -> UI ----------
+function renderOptions(){
+  for (const el of form.elements) {
+    if (!el.name) continue;
+    if (el.type === 'checkbox') el.checked = !!options[el.name];
+    else el.value = options[el.name];
+  }
+  format2Btn.classList.toggle('is-on', options.tabWidth === 2);
+  format4Btn.classList.toggle('is-on', options.tabWidth === 4);
+  format2Btn.setAttribute('aria-pressed', String(options.tabWidth === 2));
+  format4Btn.setAttribute('aria-pressed', String(options.tabWidth === 4));
+  input.style.tabSize = output.style.tabSize = options.tabWidth;
+}
+
+// ---------- formatting ----------
+let runId = 0;
+async function format(){
+  const id = ++runId;
+  renderLineNumbers(inputLines, input.value, input);
+  if (!input.value.trim()) {
+    output.textContent = '';
+    renderLineNumbers(outputLines, '', output);
+    showError('');
+    return;
+  }
+  try {
+    const result = await prettier.format(input.value, {
+      parser: 'liquid-html',
+      plugins: [prettierPluginLiquid],
+      ...options,
     });
+    if (id !== runId) return;
+    output.textContent = result;
+    renderLineNumbers(outputLines, result, output);
+    showError('');
+  } catch (err) {
+    if (id !== runId) return;
+    showError('Format error: ' + String(err && err.message ? err.message : err));
+  }
+}
 
-    tabSeg.addEventListener('click', (e) => {
-      const b = e.target.closest('button');
-      if (!b) return;
-      options.tabWidth = Number(b.dataset.value);
-      renderOptions();
-      format();
-    });
+let timer;
+const scheduleFormat = () => { clearTimeout(timer); timer = setTimeout(format, 200); };
+input.addEventListener('input', () => {
+  renderLineNumbers(inputLines, input.value, input);
+  scheduleFormat();
+});
 
-    input.addEventListener('input', scheduleFormat);
+// Tab key inserts indentation instead of leaving the field
+input.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab' || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
+  e.preventDefault();
+  const indent = options.useTabs ? '\t' : ' '.repeat(options.tabWidth);
+  input.setRangeText(indent, input.selectionStart, input.selectionEnd, 'end');
+  scheduleFormat();
+});
 
-    // Let Tab insert spaces in the input instead of leaving the field
-    input.addEventListener('keydown', (e) => {
-      if (e.key !== 'Tab' || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
-      e.preventDefault();
-      const indent = options.useTabs ? '\t' : ' '.repeat(options.tabWidth);
-      const { selectionStart: s, selectionEnd: end } = input;
-      input.setRangeText(indent, s, end, 'end');
-      scheduleFormat();
-    });
+// ---------- toolbar ----------
+function setTabWidth(n){ options.tabWidth = n; renderOptions(); format(); }
+format2Btn.addEventListener('click', () => setTabWidth(2));
+format4Btn.addEventListener('click', () => setTabWidth(4));
 
-    $('reset').addEventListener('click', () => {
-      input.value = EXAMPLE;
-      options = { ...DEFAULTS };
-      renderOptions();
-      format();
-    });
+form.addEventListener('input', (e) => {
+  const el = e.target;
+  if (!el.name) return;
+  if (el.type === 'checkbox') options[el.name] = el.checked;
+  else if (el.type === 'number') {
+    const n = parseInt(el.value, 10);
+    if (Number.isNaN(n)) return;
+    options[el.name] = n;
+  } else options[el.name] = el.value;
+  renderOptions();
+  format();
+});
 
-    function flash(btn, text) {
-      const old = btn.textContent;
-      btn.textContent = text;
-      setTimeout(() => (btn.textContent = old), 1200);
-    }
-    async function copyText(text, btn) {
-      try { await navigator.clipboard.writeText(text); flash(btn, 'Copied!'); }
-      catch {
-        const ta = document.createElement('textarea');
-        ta.value = text; document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); flash(btn, 'Copied!'); } catch { flash(btn, 'Copy failed'); }
-        ta.remove();
-      }
-    }
-    $('copy').addEventListener('click', (e) => copyText(output.textContent, e.currentTarget));
-    $('share').addEventListener('click', (e) => copyText(location.href, e.currentTarget));
+optionsBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = form.classList.toggle('open');
+  optionsBtn.setAttribute('aria-expanded', String(open));
+  optionsBtn.classList.toggle('is-on', open);
+});
+document.addEventListener('click', (e) => {
+  if (!form.classList.contains('open') || form.contains(e.target)) return;
+  form.classList.remove('open');
+  optionsBtn.setAttribute('aria-expanded', 'false');
+  optionsBtn.classList.remove('is-on');
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && form.classList.contains('open')) optionsBtn.click();
+});
 
-    // ---------- Init ----------
-    // The doc's unpkg links load the latest release, so read the version it resolved to.
-    fetch('https://unpkg.com/@shopify/prettier-plugin-liquid/package.json')
-      .then((r) => r.json())
-      .then((pkg) => { $('version').textContent = 'v' + pkg.version; })
-      .catch(() => { $('version').textContent = 'latest'; });
+function flash(btn, text){
+  const old = btn.textContent;
+  btn.textContent = text;
+  setTimeout(() => (btn.textContent = old), 1000);
+}
+async function copyText(text, btn){
+  try { await navigator.clipboard.writeText(text); flash(btn, 'Copied!'); }
+  catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); flash(btn, 'Copied!'); } catch { flash(btn, 'Copy failed'); }
+    ta.remove();
+  }
+}
+$('copyBtn').addEventListener('click', (e) => copyText(output.textContent, e.currentTarget));
+// The code + options are added to a link only when "Copy link" is clicked; the address bar stays clean.
+$('shareBtn').addEventListener('click', (e) => {
+  const link = location.origin + location.pathname + location.search + '#' + encodeState();
+  copyText(link, e.currentTarget);
+});
 
-    if (typeof prettier === 'undefined' || typeof prettierPluginLiquid === 'undefined') {
-      output.classList.add('error');
-      output.textContent = 'Could not load Prettier or the Liquid plugin from the CDN. Check your connection and reload.';
-      for (const el of form.elements) el.disabled = true;
-      for (const b of tabSeg.querySelectorAll('button')) b.disabled = true;
-    } else {
-      const saved = decodeState();
-      input.value = saved && typeof saved.code === 'string' ? saved.code : EXAMPLE;
-      if (saved && saved.options) options = { ...DEFAULTS, ...saved.options };
-      renderOptions();
-      format();
-    }
-  </script>
+$('clearBtn').addEventListener('click', () => { input.value = ''; format(); input.focus(); });
+$('resetBtn').addEventListener('click', () => {
+  input.value = EXAMPLE;
+  options = { ...DEFAULTS };
+  renderOptions();
+  format();
+});
+
+$('fileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => { input.value = evt.target.result; format(); };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+// ---------- init ----------
+applyTheme(loadPref('theme', 'light'));
+contentFontSize = parseInt(loadPref('font', '12'), 10) || 12;
+applyFontSize();
+
+// The doc's unpkg links load the latest release, so show the version they resolved to.
+fetch('https://unpkg.com/@shopify/prettier-plugin-liquid/package.json')
+  .then((r) => r.json())
+  .then((pkg) => { $('version').textContent = 'v' + pkg.version; })
+  .catch(() => { $('version').textContent = 'latest'; });
+
+if (typeof prettier === 'undefined' || typeof prettierPluginLiquid === 'undefined') {
+  showError('Could not load Prettier or the Liquid plugin from the CDN. Check your connection and reload.');
+  document.querySelectorAll('header button, header input, header select').forEach((el) => {
+    if (el !== themeToggle && el !== fontDec && el !== fontInc) el.disabled = true;
+  });
+} else {
+  const saved = decodeState();
+  input.value = saved && typeof saved.code === 'string' ? saved.code : EXAMPLE;
+  if (saved && saved.options) options = { ...DEFAULTS, ...saved.options };
+  // A shared link was opened: load its code, then clean the address bar.
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  renderOptions();
+  format();
+}
+</script>
 </body>
 </html>
